@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionário · Dr. Luiz Preto</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --navy: #1A2F4A;
+    --amber: #EF9F27;
+    --amber-light: #FDF3E3;
+    --amber-mid: #F8DFA0;
+    --green: #0F6E56;
+    --white: #FFFFFF;
+    --gray-100: #F7F8FA;
+    --gray-200: #ECEEF2;
+    --gray-400: #9BA3B0;
+    --gray-600: #5A6473;
+    --gray-800: #2C3540;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(26,47,74,0.10);
+    --shadow-lg: 0 8px 32px rgba(26,47,74,0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-800);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--navy);
+    padding: 24px 32px;
+    text-align: center;
+  }
+  .header-logo {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  .header-title {
+    color: var(--white);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .header-sub {
+    color: var(--amber);
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    background: var(--navy);
+    padding: 0 32px 16px;
+  }
+  .progress-track {
+    background: rgba(255,255,255,0.15);
+    border-radius: 100px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    background: var(--amber);
+    height: 100%;
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    color: rgba(255,255,255,0.6);
+    font-size: 11px;
+    text-align: right;
+    margin-top: 6px;
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 12px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-top: 8px;
+  }
+  .section-icon {
+    width: 36px; height: 36px;
+    background: var(--amber);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .section-desc {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 2px;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .q-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .q-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    background: var(--amber-light);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  /* INPUTS */
+  textarea, input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--gray-800);
+    background: var(--white);
+    font-family: inherit;
+    outline: none;
+    transition: border 0.2s;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  textarea { min-height: 80px; }
+  textarea:focus, input[type="text"]:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(239,159,39,0.12);
+  }
+
+  /* CHIPS */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0; }
+  .chip {
+    padding: 7px 16px;
+    border-radius: 100px;
+    border: 1.5px solid var(--gray-200);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--white);
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--amber); color: var(--navy); }
+  .chip.active { background: var(--amber); border-color: var(--amber); color: var(--navy); font-weight: 700; }
+
+  .chips-col { flex-direction: column; gap: 8px; }
+  .chip-col {
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--white);
+    user-select: none;
+    text-align: left;
+  }
+  .chip-col:hover { border-color: var(--amber); color: var(--navy); }
+  .chip-col.active { background: var(--amber-light); border-color: var(--amber); color: var(--navy); font-weight: 600; }
+
+  /* SAVE INDICATOR */
+  .save-indicator {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--green);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .save-indicator.visible { opacity: 1; }
+
+  /* FOOTER */
+  .footer {
+    background: var(--white);
+    border-top: 1px solid var(--gray-200);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+  }
+  .footer-note {
+    font-size: 12px;
+    color: var(--gray-400);
+    line-height: 1.4;
+  }
+  .footer-note strong { color: var(--navy); }
+
+  .btn-pdf {
+    padding: 14px 28px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-pdf:hover { background: #243d5e; transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+  .btn-pdf:active { transform: translateY(0); }
+  .btn-pdf .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn-clear {
+    padding: 10px 16px;
+    background: none;
+    color: var(--gray-400);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-clear:hover { border-color: #e74c3c; color: #e74c3c; }
+
+  /* PDF ONLY */
+  .pdf-header { display: none; }
+
+  /* BROWSER WARNING */
+  .browser-warning {
+    display: none;
+    background: #FDECEA;
+    border-bottom: 2px solid #e74c3c;
+    padding: 12px 24px;
+    font-size: 12px;
+    color: #7a2118;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .browser-warning.visible { display: block; }
+  .browser-warning strong { display: block; margin-bottom: 2px; font-size: 13px; }
+
+  @media (max-width: 600px) {
+    .main { padding: 20px 16px 100px; }
+    .footer { padding: 16px; flex-wrap: wrap; }
+    .btn-pdf { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="browser-warning" id="browserWarning">
+  <strong>⚠️ Abra esta página no Chrome ou Safari</strong>
+  Toque nos três pontinhos (⋮) no topo e escolha "Abrir no navegador" para preencher e gerar o PDF corretamente.
+</div>
+
+<div class="header">
+  <div class="header-logo">🐾</div>
+  <div class="header-title">Questionário — Dr. Luiz Preto</div>
+  <div class="header-sub">Vet Luiz Preto · MF Consultoria</div>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="progress-label" id="progressLabel">0 de 20 perguntas respondidas</div>
+</div>
+
+<div class="main" id="formContent">
+
+  <!-- ORIGEM E HISTÓRIA -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🌱</div>
+      <div>
+        <div class="section-title">Origem e História</div>
+        <div class="section-desc">De onde você veio e como chegou até aqui</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">1</span>Em qual cidade você nasceu e cresceu?</div>
+      <input type="text" id="q1" placeholder="Cidade e estado..." oninput="save()">
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">2</span>Com que idade você decidiu ser veterinário?</div>
+      <div class="chips">
+        <div class="chip" data-group="q2" data-val="crianca" onclick="selectChip(this)">👶 Na infância</div>
+        <div class="chip" data-group="q2" data-val="adolescente" onclick="selectChip(this)">🧒 Na adolescência</div>
+        <div class="chip" data-group="q2" data-val="faculdade" onclick="selectChip(this)">🎓 Só na faculdade</div>
+        <div class="chip" data-group="q2" data-val="depois" onclick="selectChip(this)">🔄 Mudei de ideia no caminho</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">3</span>Por que veterinária e não medicina humana?</div>
+      <textarea id="q3" placeholder="Conta como foi essa escolha..." oninput="save()"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">4</span>Qual foi seu primeiro emprego como veterinário?</div>
+      <textarea id="q4" placeholder="Onde foi, o que fazia, como foi essa experiência..." oninput="save()"></textarea>
+    </div>
+  </div>
+
+  <!-- CARREIRA -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🏆</div>
+      <div>
+        <div class="section-title">Carreira</div>
+        <div class="section-desc">30 anos de história que vale contar</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">5</span>Qual animal você mais gosta de atender?</div>
+      <div class="chips">
+        <div class="chip" data-group="q5" data-val="caes" onclick="selectChip(this)">🐶 Cães</div>
+        <div class="chip" data-group="q5" data-val="gatos" onclick="selectChip(this)">🐱 Gatos</div>
+        <div class="chip" data-group="q5" data-val="igual" onclick="selectChip(this)">❤️ Igual</div>
+        <div class="chip" data-group="q5" data-val="outros" onclick="selectChip(this)">🐾 Outros animais</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">6</span>Qual é o caso mais marcante da sua carreira? (pode ser engraçado, emocionante ou inusitado)</div>
+      <textarea id="q6" placeholder="Pode ser qualquer coisa — um diagnóstico difícil, um momento engraçado, um pet especial..." oninput="save()"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">7</span>O que você mais gosta no trabalho de veterinário?</div>
+      <div class="chips" style="margin-bottom:12px">
+        <div class="chip" data-group="q7" data-val="diagnostico" onclick="selectChipMulti(this)">🔍 Resolver o diagnóstico</div>
+        <div class="chip" data-group="q7" data-val="relacao" onclick="selectChipMulti(this)">🤝 Relação com os tutores</div>
+        <div class="chip" data-group="q7" data-val="pets" onclick="selectChipMulti(this)">🐾 Os próprios animais</div>
+        <div class="chip" data-group="q7" data-val="ver_melhora" onclick="selectChipMulti(this)">💪 Ver o pet se recuperar</div>
+        <div class="chip" data-group="q7" data-val="prevencao" onclick="selectChipMulti(this)">🛡️ Prevenção e educação</div>
+      </div>
+      <textarea id="q7_obs" placeholder="Quer adicionar algo? (opcional)" oninput="save()"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">8</span>O que você nunca abre mão no atendimento?</div>
+      <textarea id="q8" placeholder="Uma coisa que é inegociável pra você na hora de atender..." oninput="save()"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">9</span>O que mais surpreende os clientes quando te conhecem?</div>
+      <textarea id="q9" placeholder="Algo que as pessoas não esperam de você ou do seu jeito de trabalhar..." oninput="save()"></textarea>
+    </div>
+  </div>
+
+  <!-- PETS E RELAÇÃO COM ANIMAIS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🐾</div>
+      <div>
+        <div class="section-title">Sua Relação com Pets</div>
+        <div class="section-desc">O veterinário fora do consultório</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">10</span>Você tem pets hoje?</div>
+      <div class="chips" style="margin-bottom:12px">
+        <div class="chip" data-group="q10" data-val="sim_caes" onclick="selectChip(this)">🐶 Sim, cão</div>
+        <div class="chip" data-group="q10" data-val="sim_gatos" onclick="selectChip(this)">🐱 Sim, gato</div>
+        <div class="chip" data-group="q10" data-val="sim_varios" onclick="selectChip(this)">🐾 Sim, vários</div>
+        <div class="chip" data-group="q10" data-val="nao" onclick="selectChip(this)">❌ Não no momento</div>
+      </div>
+      <input type="text" id="q10_nome" placeholder="Se sim, qual o nome? (opcional)" oninput="save()">
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">11</span>Tem algum pet que foi especialmente marcante na sua vida?</div>
+      <textarea id="q11" placeholder="Um animal que você nunca esqueceu — pode ser seu ou de um cliente..." oninput="save()"></textarea>
+    </div>
+  </div>
+
+  <!-- PERSONALIDADE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">😄</div>
+      <div>
+        <div class="section-title">Personalidade</div>
+        <div class="section-desc">O Dr. Luiz fora do jaleco</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">12</span>O que você gosta de fazer quando não está trabalhando?</div>
+      <div class="chips" style="margin-bottom:12px">
+        <div class="chip" data-group="q12" data-val="esporte" onclick="selectChipMulti(this)">⚽ Esporte</div>
+        <div class="chip" data-group="q12" data-val="musica" onclick="selectChipMulti(this)">🎵 Música</div>
+        <div class="chip" data-group="q12" data-val="viagem" onclick="selectChipMulti(this)">✈️ Viagem</div>
+        <div class="chip" data-group="q12" data-val="familia" onclick="selectChipMulti(this)">👨‍👩‍👧 Família</div>
+        <div class="chip" data-group="q12" data-val="leitura" onclick="selectChipMulti(this)">📚 Leitura</div>
+        <div class="chip" data-group="q12" data-val="gastronomia" onclick="selectChipMulti(this)">🍽️ Gastronomia</div>
+        <div class="chip" data-group="q12" data-val="natureza" onclick="selectChipMulti(this)">🌿 Natureza</div>
+      </div>
+      <input type="text" id="q12_outro" placeholder="Algum outro hobby? (opcional)" oninput="save()">
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">13</span>Série ou filme favorito?</div>
+      <input type="text" id="q13" placeholder="Pode ser mais de um..." oninput="save()">
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">14</span>Se não fosse veterinário, o que você seria?</div>
+      <input type="text" id="q14" placeholder="Primeira coisa que veio na cabeça..." oninput="save()">
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">15</span>Como as pessoas que te conhecem bem te descreveriam em três palavras?</div>
+      <input type="text" id="q15" placeholder="Ex: calmo, direto, engraçado..." oninput="save()">
+    </div>
+  </div>
+
+  <!-- FILOSOFIA DE TRABALHO -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">💡</div>
+      <div>
+        <div class="section-title">Filosofia de Trabalho</div>
+        <div class="section-desc">O que guia o jeito de você trabalhar</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">16</span>Como você descreveria seu jeito de atender em uma frase?</div>
+      <input type="text" id="q16" placeholder="Uma frase que te representa no consultório..." oninput="save()">
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">17</span>Qual é a maior diferença entre um bom veterinário e um veterinário mediano, na sua opinião?</div>
+      <textarea id="q17" placeholder="Pode ser técnica, comportamental, ou os dois..." oninput="save()"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">18</span>O que você quer que seus clientes sintam quando saem da consulta?</div>
+      <div class="chips" style="margin-bottom:12px">
+        <div class="chip" data-group="q18" data-val="seguranca" onclick="selectChipMulti(this)">🛡️ Seguros e tranquilos</div>
+        <div class="chip" data-group="q18" data-val="informados" onclick="selectChipMulti(this)">📋 Bem informados</div>
+        <div class="chip" data-group="q18" data-val="cuidados" onclick="selectChipMulti(this)">❤️ Que o pet foi bem cuidado</div>
+        <div class="chip" data-group="q18" data-val="confianca" onclick="selectChipMulti(this)">🤝 Confiança no tratamento</div>
+        <div class="chip" data-group="q18" data-val="acolhidos" onclick="selectChipMulti(this)">🌟 Acolhidos e respeitados</div>
+      </div>
+      <textarea id="q18_obs" placeholder="Quer adicionar algo? (opcional)" oninput="save()"></textarea>
+    </div>
+  </div>
+
+  <!-- CURIOSIDADES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">✨</div>
+      <div>
+        <div class="section-title">Curiosidades</div>
+        <div class="section-desc">Coisas que as pessoas não sabem mas vão adorar saber</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">19</span>Qual é a maior mentira que as pessoas acreditam sobre cuidar de pets?</div>
+      <textarea id="q19" placeholder="Um mito comum que você já corrigiu mil vezes..." oninput="save()"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label"><span class="q-number">20</span>Conta uma situação engraçada ou inusitada que aconteceu durante um atendimento.</div>
+      <textarea id="q20" placeholder="Pode ser algo que um pet fez, um cliente falou, ou qualquer momento que ficou na memória..." oninput="save()"></textarea>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div>
+    <div class="footer-note"><strong>✅ Respostas salvas automaticamente.</strong><br>Pode fechar e continuar depois.</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <button class="btn-clear" onclick="clearAll()">🗑️ Limpar tudo</button>
+    <button class="btn-pdf" id="btnPdf" onclick="generatePDF()">
+      <span class="spinner" id="pdfSpinner"></span>
+      <span id="btnPdfLabel">📄 Gerar PDF</span>
+    </button>
+  </div>
+</div>
+
+<div class="save-indicator" id="saveIndicator">✅ Salvo</div>
+
+<script>
+const STORAGE_KEY = 'questionario_dr_luiz_v1';
+let saveTimer = null;
+
+// ====== DETECTA NAVEGADOR IN-APP (WhatsApp, Instagram, Facebook) ======
+// Esses navegadores internos têm limitações sérias com JS pesado e geração de PDF.
+function detectInAppBrowser() {
+  const ua = navigator.userAgent || '';
+  const isInApp = /FBAN|FBAV|Instagram|WhatsApp|Line\//i.test(ua);
+  if (isInApp) {
+    document.getElementById('browserWarning').classList.add('visible');
+  }
+}
+detectInAppBrowser();
+
+// ====== CHIPS ======
+function selectChip(el) {
+  const group = el.dataset.group;
+  document.querySelectorAll(`[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  save();
+  updateProgress();
+}
+
+function selectChipMulti(el) {
+  el.classList.toggle('active');
+  save();
+  updateProgress();
+}
+
+// ====== SAVE / LOAD ======
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = {};
+    // Text inputs
+    document.querySelectorAll('input[type="text"], textarea').forEach(el => {
+      if (el.id) data[el.id] = el.value;
+    });
+    // Chips
+    document.querySelectorAll('.chip.active, .chip-col.active').forEach(el => {
+      if (!data._chips) data._chips = [];
+      data._chips.push({ group: el.dataset.group, val: el.dataset.val });
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    showSaved();
+    updateProgress();
+  }, 600);
+}
+
+function load() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    Object.keys(data).forEach(key => {
+      if (key === '_chips') return;
+      const el = document.getElementById(key);
+      if (el) el.value = data[key];
+    });
+    if (data._chips) {
+      data._chips.forEach(({ group, val }) => {
+        const el = document.querySelector(`[data-group="${group}"][data-val="${val}"]`);
+        if (el) el.classList.add('active');
+      });
+    }
+    updateProgress();
+  } catch(e) {}
+}
+
+function clearAll() {
+  if (!confirm('Tem certeza que quer apagar todas as respostas?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+  document.querySelectorAll('.chip.active, .chip-col.active').forEach(el => el.classList.remove('active'));
+  updateProgress();
+}
+
+function showSaved() {
+  const el = document.getElementById('saveIndicator');
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 2000);
+}
+
+// ====== PROGRESS ======
+function updateProgress() {
+  let answered = 0;
+  const total = 20;
+
+  // Text fields (count if not empty)
+  const textIds = ['q1','q3','q4','q6','q7_obs','q8','q9','q10_nome','q11','q12_outro','q13','q14','q15','q16','q17','q18_obs','q19','q20'];
+  const chipGroups = ['q2','q5','q7','q10','q12','q18'];
+
+  // Count answered questions by question number
+  const answeredQs = new Set();
+
+  textIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.value.trim()) {
+      const qNum = id.match(/^q(\d+)/)?.[1];
+      if (qNum) answeredQs.add(qNum);
+    }
+  });
+
+  chipGroups.forEach(group => {
+    const active = document.querySelector(`[data-group="${group}"].active`);
+    if (active) {
+      const qNum = group.replace('q','');
+      answeredQs.add(qNum);
+    }
+  });
+
+  answered = Math.min(answeredQs.size, total);
+  const pct = Math.round((answered / total) * 100);
+
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${answered} de ${total} perguntas respondidas`;
+}
+
+// ====== PDF ======
+async function generatePDF() {
+  const btn = document.getElementById('btnPdf');
+  const spinner = document.getElementById('pdfSpinner');
+  const label = document.getElementById('btnPdfLabel');
+
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  label.textContent = 'Gerando...';
+
+  // Build PDF content
+  const sections = [
+    { title: '🌱 Origem e História', questions: [
+      { n: 1, label: 'Em qual cidade você nasceu e cresceu?', id: 'q1', type: 'text' },
+      { n: 2, label: 'Com que idade você decidiu ser veterinário?', id: 'q2', type: 'chip', group: 'q2' },
+      { n: 3, label: 'Por que veterinária e não medicina humana?', id: 'q3', type: 'text' },
+      { n: 4, label: 'Qual foi seu primeiro emprego como veterinário?', id: 'q4', type: 'text' },
+    ]},
+    { title: '🏆 Carreira', questions: [
+      { n: 5, label: 'Qual animal você mais gosta de atender?', id: 'q5', type: 'chip', group: 'q5' },
+      { n: 6, label: 'Qual é o caso mais marcante da sua carreira?', id: 'q6', type: 'text' },
+      { n: 7, label: 'O que você mais gosta no trabalho?', id: 'q7', type: 'chipMulti+text', group: 'q7', extra: 'q7_obs' },
+      { n: 8, label: 'O que você nunca abre mão no atendimento?', id: 'q8', type: 'text' },
+      { n: 9, label: 'O que mais surpreende os clientes quando te conhecem?', id: 'q9', type: 'text' },
+    ]},
+    { title: '🐾 Sua Relação com Pets', questions: [
+      { n: 10, label: 'Você tem pets hoje?', id: 'q10', type: 'chip+text', group: 'q10', extra: 'q10_nome' },
+      { n: 11, label: 'Tem algum pet que foi especialmente marcante na sua vida?', id: 'q11', type: 'text' },
+    ]},
+    { title: '😄 Personalidade', questions: [
+      { n: 12, label: 'O que você gosta de fazer quando não está trabalhando?', id: 'q12', type: 'chipMulti+text', group: 'q12', extra: 'q12_outro' },
+      { n: 13, label: 'Série ou filme favorito?', id: 'q13', type: 'text' },
+      { n: 14, label: 'Se não fosse veterinário, o que você seria?', id: 'q14', type: 'text' },
+      { n: 15, label: 'Como as pessoas te descreveriam em três palavras?', id: 'q15', type: 'text' },
+    ]},
+    { title: '💡 Filosofia de Trabalho', questions: [
+      { n: 16, label: 'Como você descreveria seu jeito de atender em uma frase?', id: 'q16', type: 'text' },
+      { n: 17, label: 'Qual é a maior diferença entre um bom veterinário e um mediano?', id: 'q17', type: 'text' },
+      { n: 18, label: 'O que você quer que seus clientes sintam quando saem da consulta?', id: 'q18', type: 'chipMulti+text', group: 'q18', extra: 'q18_obs' },
+    ]},
+    { title: '✨ Curiosidades', questions: [
+      { n: 19, label: 'Qual é a maior mentira que as pessoas acreditam sobre cuidar de pets?', id: 'q19', type: 'text' },
+      { n: 20, label: 'Conta uma situação engraçada ou inusitada que aconteceu num atendimento.', id: 'q20', type: 'text' },
+    ]},
+  ];
+
+  function getChipValues(group) {
+    return Array.from(document.querySelectorAll(`[data-group="${group}"].active`))
+      .map(el => el.textContent.trim()).join(', ');
+  }
+  function getTextValue(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  let html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="text-align:center; background:#1A2F4A; color:white; padding:24px; border-radius:12px; margin-bottom:24px;">
+        <div style="font-size:28px;margin-bottom:8px">🐾</div>
+        <div style="font-size:20px;font-weight:800;">Questionário — Dr. Luiz Preto</div>
+        <div style="font-size:12px;color:#EF9F27;margin-top:4px;">Vet Luiz Preto · MF Consultoria</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:8px;">Gerado em ${new Date().toLocaleDateString('pt-BR')}</div>
+      </div>
+  `;
+
+  sections.forEach(section => {
+    html += `<div style="margin-bottom:24px;">
+      <div style="font-size:15px;font-weight:800;color:#1A2F4A;border-bottom:2px solid #EF9F27;padding-bottom:8px;margin-bottom:16px;">${section.title}</div>`;
+
+    section.questions.forEach(q => {
+      let answer = '';
+      if (q.type === 'text') {
+        answer = getTextValue(q.id) || '—';
+      } else if (q.type === 'chip') {
+        answer = getChipValues(q.group) || '—';
+      } else if (q.type === 'chip+text') {
+        const chips = getChipValues(q.group);
+        const extra = getTextValue(q.extra);
+        answer = [chips, extra].filter(Boolean).join(' · ') || '—';
+      } else if (q.type === 'chipMulti+text') {
+        const chips = getChipValues(q.group);
+        const extra = getTextValue(q.extra);
+        answer = [chips, extra].filter(Boolean).join('\n') || '—';
+      }
+
+      html += `
+        <div style="margin-bottom:14px;padding:14px;background:#F7F8FA;border-radius:8px;border-left:3px solid #EF9F27;">
+          <div style="font-size:11px;font-weight:700;color:#9BA3B0;margin-bottom:4px;">PERGUNTA ${q.n}</div>
+          <div style="font-size:13px;font-weight:600;color:#1A2F4A;margin-bottom:8px;">${q.label}</div>
+          <div style="font-size:13px;color:#2C3540;line-height:1.5;white-space:pre-wrap;">${answer}</div>
+        </div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  html += `</div>`;
+
+  const container = document.createElement('div');
+  container.innerHTML = html;
+
+  // Posiciona fora da tela, mas com largura fixa — evita cortes e telas em branco
+  // causados por viewports estreitos ou navegadores internos (WhatsApp/Instagram)
+  container.style.position = 'fixed';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.width = '650px';
+  container.style.zIndex = '-1000';
+  container.style.background = '#ffffff';
+  container.style.opacity = '1';
+  document.body.appendChild(container);
+
+  try {
+    // Pequena espera para garantir que o navegador terminou o reflow/layout
+    // antes do html2canvas capturar a página
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    await html2pdf().set({
+      margin: 10,
+      filename: 'Questionario_Dr_Luiz_Preto.pdf',
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        windowWidth: 650,
+        scrollY: 0
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'avoid-all'] }
+    }).from(container).save();
+  } catch (err) {
+    alert('Não foi possível gerar o PDF neste navegador. Tente abrir esta página no Chrome ou Safari (fora do WhatsApp) e gerar novamente.');
+  } finally {
+    document.body.removeChild(container);
+  }
+
+  btn.disabled = false;
+  spinner.style.display = 'none';
+  label.textContent = '📄 Gerar PDF';
+}
+
+// Init
+load();
+updateProgress();
+</script>
+</body>
+</html>
